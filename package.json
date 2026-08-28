@@ -1,0 +1,9 @@
+{
+  "name": "lucky-ladybug-garden",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend functions for Lucky Ladybug Garden's Etsy purchase verification.",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.8"
+  }
+}
