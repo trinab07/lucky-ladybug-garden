@@ -2,11 +2,10 @@ const crypto = require("crypto");
 
 exports.handler = async function () {
   const apiKey = process.env.ETSY_API_KEY;
-
   if (!apiKey) {
     return {
       statusCode: 500,
-      body: "ETSY_API_KEY is not configured."
+      body: "ETSY_API_KEY is not configured.",
     };
   }
 
@@ -16,9 +15,7 @@ exports.handler = async function () {
     .createHash("sha256")
     .update(codeVerifier)
     .digest("base64url");
-
   const state = crypto.randomBytes(16).toString("hex");
-
   const redirectUri =
     "https://lucky-ladybug-garden.netlify.app/.netlify/functions/etsy-callback";
 
@@ -29,18 +26,22 @@ exports.handler = async function () {
     client_id: apiKey,
     state: state,
     code_challenge: codeChallenge,
-    code_challenge_method: "S256"
+    code_challenge_method: "S256",
   });
 
   return {
     statusCode: 302,
     headers: {
       Location: `https://www.etsy.com/oauth/connect?${params.toString()}`,
+    },
+    multiValueHeaders: {
+      // Two Set-Cookie values must go here, not under `headers`,
+      // which only supports one value per header name.
       "Set-Cookie": [
         `etsy_code_verifier=${codeVerifier}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`,
-        `etsy_oauth_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`
-      ]
+        `etsy_oauth_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`,
+      ],
     },
-    body: ""
+    body: "",
   };
 };
