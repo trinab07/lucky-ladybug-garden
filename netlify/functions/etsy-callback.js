@@ -119,7 +119,11 @@ exports.handler = async function (event) {
     // number is your own Etsy user ID, useful later, not a secret by itself.
     let store;
     try {
-      store = getStore("etsy-auth");
+      store = getStore({
+        name: "etsy-auth",
+        siteID: process.env.NETLIFY_SITE_ID,
+        token: process.env.NETLIFY_BLOBS_TOKEN,
+      });
       await store.setJSON("shop-refresh-token", {
         refresh_token: tokenData.refresh_token,
         access_token: tokenData.access_token,
