@@ -98,6 +98,12 @@ exports.handler = async function (event) {
     const tokenData = await tokenResp.json();
 
     if (!tokenResp.ok || !tokenData.access_token) {
+      console.error(
+        "Etsy token exchange failed. HTTP status:",
+        tokenResp.status,
+        "Response body:",
+        JSON.stringify(tokenData)
+      );
       return {
         statusCode: 200,
         headers: { "Content-Type": "text/html" },
@@ -111,13 +117,27 @@ exports.handler = async function (event) {
 
     // access_token from Etsy is formatted "{user_id}.{token}" -- the leading
     // number is your own Etsy user ID, useful later, not a secret by itself.
-    const store = getStore("etsy-auth");
-    await store.setJSON("shop-refresh-token", {
-      refresh_token: tokenData.refresh_token,
-      access_token: tokenData.access_token,
-      obtained_at: Date.now(),
-      expires_in: tokenData.expires_in,
-    });
+    let store;
+    try {
+      store = getStore("etsy-auth");
+      await store.setJSON("shop-refresh-token", {
+        refresh_token: tokenData.refresh_token,
+        access_token: tokenData.access_token,
+        obtained_at: Date.now(),
+        expires_in: tokenData.expires_in,
+      });
+    } catch (storeErr) {
+      console.error("Failed to save token to Netlify Blobs:", storeErr.message, storeErr.stack);
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "text/html" },
+        body: page(
+          "Connected to Etsy, but couldn't save it",
+          "Etsy approved the connection, but there was a problem saving the credential for later use. Please let the developer know this specific step failed at the storage stage.",
+          false
+        ),
+      };
+    }
 
     return {
       statusCode: 200,
@@ -139,6 +159,7 @@ exports.handler = async function (event) {
       ),
     };
   } catch (err) {
+    console.error("Unhandled error in etsy-callback:", err.message, err.stack);
     return {
       statusCode: 500,
       headers: { "Content-Type": "text/html" },
