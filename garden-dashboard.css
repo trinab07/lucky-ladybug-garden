@@ -31,10 +31,10 @@
 #dashboard .gardenSummaryTape{position:absolute;top:-6px;left:calc(50% - 20px);width:40px;height:13px;background:#e8d495b3;transform:rotate(-5deg)}
 #dashboard .gardenBlue .gardenSummaryTape{transform:rotate(4deg)}
 #dashboard .gardenSummaryCard:focus-visible,#dashboard .gardenDashboardActions button:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
-#dashboard .gardenQuickRow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 12px}
+#dashboard .gardenQuickRow{display:grid;gap:10px;margin:20px 0 12px;padding:14px 16px;background:#f5edcf;border:1px solid #d8c99e;border-radius:4px;box-shadow:2px 3px 0 #ddd7c344}
 #dashboard .gardenQuickRow h2,#dashboard .gardenRecentHeading h2,#dashboard .gardenLadybugBanner h2{font-size:17px;margin:0;color:var(--navy)}
-#dashboard .gardenDashboardActions{display:flex;flex-wrap:wrap;gap:8px}
-#dashboard .gardenDashboardActions button{min-height:44px;padding:8px 13px;font-size:12px;background:#fffdf4;border:1px dashed #b8c4aa;white-space:normal}
+#dashboard .gardenDashboardActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#dashboard .gardenDashboardActions button{min-width:0;min-height:44px;padding:8px 10px;font-size:12px;background:#fffdf4;border:1px solid #b8c4aa;white-space:normal;overflow-wrap:anywhere}
 #dashboard .gardenCaptureStatus{font-size:12px;margin:0 0 10px;color:var(--muted)}
 #dashboard .gardenCaptureStatus:empty{display:none}
 #dashboard .gardenRecentPaper{padding:12px 16px;border:1px solid #e5dfcb;background:#fffdf7;box-shadow:2px 3px 0 #ddd7c333}
@@ -53,9 +53,9 @@
  #dashboard .gardenOverviewGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
  #dashboard .gardenSummaryCard{min-height:108px;padding:12px 6px 9px}
  #dashboard .gardenSummaryCard strong{font-size:28px}
- #dashboard .gardenQuickRow{display:block;margin:16px 0 12px}
- #dashboard .gardenQuickRow h2{margin-bottom:8px}
- #dashboard .gardenDashboardActions{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:6px}
+ #dashboard .gardenQuickRow{margin:16px 0 12px;padding:12px;gap:8px}
+ #dashboard .gardenQuickRow h2{margin-bottom:0}
+ #dashboard .gardenDashboardActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
  #dashboard .gardenDashboardActions button{font-size:11px;padding:7px 5px}
  #dashboard .gardenRecentPaper{padding:9px 12px}
  #dashboard .gardenLadybugBanner{display:grid;grid-template-columns:26px 1fr;padding:12px;gap:8px}
