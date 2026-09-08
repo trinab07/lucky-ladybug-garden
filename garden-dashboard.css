@@ -1,0 +1,63 @@
+.gardenAttentionItem{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;text-align:left;border:0;border-bottom:1px dashed var(--line);background:transparent;color:var(--navy);padding:14px;font:inherit;cursor:pointer;overflow-wrap:anywhere}
+.gardenAttentionItem:last-child{border-bottom:0}
+.gardenAttentionItem>span:first-child{min-width:0}
+.gardenAttentionItem b,.gardenAttentionItem span span,.gardenAttentionItem small{display:block}
+.gardenAttentionItem small{color:var(--muted);margin-top:4px}
+.gardenAttentionItem:focus-visible,.gardenQuickButtons button:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+.gardenQuickButtons{display:flex;flex-wrap:wrap;gap:10px}
+.gardenQuickButtons button{min-height:44px;white-space:normal;flex:1 1 150px}
+.gardenCareChoices{border:1px dashed var(--line);border-radius:12px;padding:12px;margin:0 0 14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.gardenCareChoices legend{padding:0 5px;font-weight:700}
+.gardenCareChoices label{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer}
+.gardenCareChoices input{width:20px;height:20px;flex-shrink:0;margin:0}
+#gardenQuickError{color:#9b302d}
+#gardenQuickStatus:empty{margin:0}
+#gardenQuickForm input,#gardenQuickForm select,#gardenQuickForm textarea,#gardenFullChooser select{max-width:100%;box-sizing:border-box}
+@media(max-width:420px){.gardenCareChoices{grid-template-columns:1fr}.gardenQuickButtons button{flex-basis:100%}}
+
+/* Dashboard summaries only; detail views and the fixed navigation keep their styles. */
+#dashboard.compactGardenDashboard{max-width:1060px;margin:0 auto;padding-top:12px}
+#dashboard .gardenOverviewTitle{font-size:21px;margin:0 0 16px;color:var(--navy);text-align:left}
+#dashboard .gardenOverviewTitle span{color:#b76c4e;font-size:16px;margin-left:6px}
+#dashboard .gardenOverviewGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+#dashboard .gardenSummaryCard{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:130px;padding:16px 10px 12px;border:1px solid #dfd6bd;border-radius:3px;box-shadow:2px 3px 0 #ddd7c344;color:#294e3e;font:inherit;cursor:pointer}
+#dashboard .gardenSummaryCard b{font-size:14px;font-weight:700}
+#dashboard .gardenSummaryCard strong{font-size:32px;line-height:1.15}
+#dashboard .gardenSummaryCard small{font-size:11px;color:#435e50}
+#dashboard .gardenYellow{background:#f8eaa0}
+#dashboard .gardenBlue{background:#d0e8ed}
+#dashboard .gardenGreen{background:#dce9c8}
+#dashboard .gardenTerracotta{background:#eed1ba}
+#dashboard .gardenSummaryTape{position:absolute;top:-6px;left:calc(50% - 20px);width:40px;height:13px;background:#e8d495b3;transform:rotate(-5deg)}
+#dashboard .gardenBlue .gardenSummaryTape{transform:rotate(4deg)}
+#dashboard .gardenSummaryCard:focus-visible,#dashboard .gardenDashboardActions button:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
+#dashboard .gardenQuickRow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 12px}
+#dashboard .gardenQuickRow h2,#dashboard .gardenRecentHeading h2,#dashboard .gardenLadybugBanner h2{font-size:17px;margin:0;color:var(--navy)}
+#dashboard .gardenDashboardActions{display:flex;flex-wrap:wrap;gap:8px}
+#dashboard .gardenDashboardActions button{min-height:44px;padding:8px 13px;font-size:12px;background:#fffdf4;border:1px dashed #b8c4aa;white-space:normal}
+#dashboard .gardenCaptureStatus{font-size:12px;margin:0 0 10px;color:var(--muted)}
+#dashboard .gardenCaptureStatus:empty{display:none}
+#dashboard .gardenRecentPaper{padding:12px 16px;border:1px solid #e5dfcb;background:#fffdf7;box-shadow:2px 3px 0 #ddd7c333}
+#dashboard .gardenRecentHeading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#dashboard .gardenRecentHeading button{padding:6px 10px;min-height:40px;font-size:11px}
+#dashboard #recentActivity .row{padding:7px 0!important;font-size:12px;min-height:0}
+#dashboard #recentActivity .plantArt{width:32px!important;height:36px!important;min-width:32px!important;flex-basis:32px!important;margin:0 8px 0 0!important}
+#dashboard #recentActivity .empty{padding:14px 0;font-size:12px}
+#dashboard .gardenLadybugBanner{display:flex;align-items:center;gap:12px;padding:14px 16px;margin:16px 0 8px;background:#e8efda;border:1px dashed #b6c5a9;border-radius:12px}
+#dashboard .gardenLadybugBanner p{font-size:12px;margin:4px 0 0;color:var(--muted)}
+#dashboard .gardenHelpBug{font-size:26px}
+#dashboard .gardenLadybugBanner>div{flex:1;min-width:0}
+#dashboard .gardenLadybugBanner button{min-height:44px;padding:8px 12px;font-size:12px}
+#dashboard .gardenLegacyHooks{display:none!important}
+@media(max-width:600px){
+ #dashboard .gardenOverviewGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ #dashboard .gardenSummaryCard{min-height:108px;padding:12px 6px 9px}
+ #dashboard .gardenSummaryCard strong{font-size:28px}
+ #dashboard .gardenQuickRow{display:block;margin:16px 0 12px}
+ #dashboard .gardenQuickRow h2{margin-bottom:8px}
+ #dashboard .gardenDashboardActions{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:6px}
+ #dashboard .gardenDashboardActions button{font-size:11px;padding:7px 5px}
+ #dashboard .gardenRecentPaper{padding:9px 12px}
+ #dashboard .gardenLadybugBanner{display:grid;grid-template-columns:26px 1fr;padding:12px;gap:8px}
+ #dashboard .gardenLadybugBanner button{grid-column:2;justify-self:start}
+}
