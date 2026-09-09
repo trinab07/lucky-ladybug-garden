@@ -13,7 +13,7 @@ const patterns = {
  mushy:/\b(mushy|squishy|slimy|soft and black)\b/g,
  healthyRoots:/\b(?:(?:firm|healthy|white) (?:and (?:firm|healthy|white) )?roots|roots (?:are |look |feel )?(?:firm|healthy|white))\b/g,
  rot:/\b(?:root )?rot(?:ting)?\b/g,
- slow:/\b(?:slow growth|growing (?:really )?slow(?:ly)?|barely grows?|not growing|isn't growing|no new growth|stopped growing)\b/g,
+ slow:/\b(?:slow growth|growth (?:is )?(?:so |really )?slow|(?:isn't|is not) (?:my |the |this )?plant growing|(?:plant )?(?:stopped|stop) growing|growing (?:really )?slow(?:ly)?|barely grows?|not growing|isn't growing|no new growth|stopped growing)\b/g,
  leggy:/\b(leggy|stretching|long gaps)\b/g, drop:/\b(?:dropping|losing|falling) leaves\b/g
 };
 function polarity(text,match){
@@ -86,6 +86,17 @@ function extract(input, previous={}, names=[]){
  if(previous.pending==='node'&&/^(?:no|nope|nah)\b/.test(text))clues.node=false;
  const known=[...names,'rubber plant','snake plant','zz plant','peace lily','spider plant','hoya','pothos','monstera','philodendron','calathea','alocasia','orchid','fern','cactus','succulent','begonia','peperomia','ficus','jade','pilea','ivy'].filter(Boolean).sort((a,b)=>b.length-a.length);
  const plant=known.find(n=>word(normalize(n)).test(text));
+ const focused=launchTopics(text);
+ const named=[];
+ for(const pest of pestNames){if(pest==='scale'&&/\b(?:weigh|scale up|scale of|on a scale|kitchen scale)\b/.test(text))continue;const m=new RegExp('\\b'+pest.replace(/s$/,'s?')+'\\b').exec(text);if(m){const sign=polarity(text,m);if(sign===true)named.push(pest);else if(previous.facts?.namedPest===pest)clues.namedPest=null;}}
+ if(named.length){clues.namedPest=named.sort((a,b)=>b.length-a.length)[0];clues.bugs=true;}
+ if(/\b(?:stems?|crown) (?:are |is |feel |feels )?(?:firm|green|alive)\b|\b(?:firm|green|living) (?:stems?|crown|tissue)\b/.test(text))clues.livingTissue=true;
+ if(/\b(?:stems?|crown) (?:are |is )?(?:mushy|dead|brittle)\b/.test(text))clues.livingTissue=false;
+ if(/\b(?:regrown|new leaves now|has leaves now|no longer leafless)\b/.test(text))clues.leafless=false;
+ else if(focused.includes('leafless'))clues.leafless=true;
+ const sunHours=text.match(/\b(\d+(?:\.\d+)?) hours? (?:of )?(?:direct )?sun/);if(sunHours)clues.sunHours=Number(sunHours[1]);if(/\b(?:no|not in|doesn't get|does not get) direct sun\b/.test(text)){clues.sunHours=0;if(clues.light==='direct sun'||clues.light==='direct sunlight')delete clues.light;}
+ const temperature=text.match(/\b(\d{1,3})\s*(?:°\s*)?(f|c|fahrenheit|celsius)\b/i);if(temperature)clues.temperature=temperature[1]+' '+temperature[2].toUpperCase();
+ if(previous.pending==='livingTissue'&&/\b(firm|green|alive)\b/.test(text))clues.livingTissue=true;
  const careIntent=/\b(how|when|should|what|can|does|do|need|best|safe)\b/.test(text);
  const currentSymptoms=Object.entries(clues).some(([k,v])=>k in patterns && !['rot','healthyRoots'].includes(k)&&v===true);
  // A proposed care action or a question about light is not an observation.
@@ -94,10 +105,10 @@ function extract(input, previous={}, names=[]){
   if(!/\b(repotted|moved|fertilized|brought home|knocked over|uprooted)\b/.test(text))delete clues.changes;
   if(!/\b(?:it is|it's|it was|started as|started from|came from|i have|has)\b/.test(text))delete clues.cutting;
  }
- return {text,clues,plant,uncertain,intent:currentSymptoms?'troubleshooting':careIntent?'care':Object.keys(clues).length?'followup':'unknown', correction:/\b(actually|correction|i meant|sorry|instead|now|not .+ anymore)\b/.test(text)};
+ return {text,clues,plant,uncertain,focused,intent:currentSymptoms?'troubleshooting':careIntent?'care':Object.keys(clues).length?'followup':'unknown', correction:/\b(actually|correction|i meant|sorry|instead|now|not .+ anymore)\b/.test(text)};
 }
 function createSession(plant=''){return {plant,facts:{},asked:[],pending:null,turns:[],topic:null};}
-const questions={moisture:'Does the soil feel wet, lightly moist, or dry below the surface?',extent:'Is it one older leaf or several leaves across the plant?',pestDetail:'What do the bugs look like, and where are you seeing them?',light:'What light does it get during the day?',timing:'When did this start?',changes:'Has anything changed recently, such as watering, location, or repotting?',roots:'If the roots are already visible, do they feel firm or mushy?',symptoms:'What change are you seeing in the plant?',drainage:'Does the pot have drainage holes?',node:'Does the cutting include a stem node—the small bump where a leaf joins the stem?',plant:'What is the plant’s name?'};
+const questions={livingTissue:'Are the stems or crown still firm, with any green living tissue?',sunHours:'How many hours of direct sunlight reach the leaves?',temperature:'What are the lowest overnight temperatures where you would put it?',moisture:'Does the soil feel wet, lightly moist, or dry below the surface?',extent:'Is it one older leaf or several leaves across the plant?',pestDetail:'What do the bugs look like, and where are you seeing them?',light:'What light does it get during the day?',timing:'When did this start?',changes:'Has anything changed recently, such as watering, location, or repotting?',roots:'If the roots are already visible, do they feel firm or mushy?',symptoms:'What change are you seeing in the plant?',drainage:'Does the pot have drainage holes?',node:'Does the cutting include a stem node—the small bump where a leaf joins the stem?',plant:'What is the plant’s name?'};
 
 // A broad plant name only inherits guide fields shared by all matching varieties.
 function resolveProfile(plant,library=[]){
@@ -137,6 +148,60 @@ function topicsFor(text){
  if(topics.includes('propagation')&&!/\b(?:also|and how|how often|when should).*(?:water|soil)\b/.test(text))return topics.filter(k=>!['watering','soil'].includes(k));
  return topics;
 }
+const pestNames=['root mealybugs','spider mites','fungus gnats','mealybugs','whiteflies','aphids','thrips','scale'];
+function launchTopics(text){
+ const topics=[];
+ if(/\b(?:no leaves|leafless|lost (?:all (?:of )?(?:its |the |my )?leaves|every leaf)|losing every leaf)\b/.test(text))topics.push('leafless');
+ if(/\b(?:outside|outdoors)\b/.test(text))topics.push('outdoors');
+ if(/\b(?:new leaves (?:are )?smaller|(?:new growth|new leaves) (?:is |are )?(?:smaller|tiny)|(?:putting out|growing) tiny leaves)\b/.test(text))topics.push('smallLeaves');
+ if(/\boverwater\w*\b/.test(text)&&/\bunderwater\w*\b/.test(text)||/\btoo much water\b.*\btoo little\b|\btoo wet or (?:too )?dry\b/.test(text))topics.push('comparison');
+ if(/\b(?:too much (?:light|sun)|too bright|sunburn(?:ed|t)?|scorched by (?:light|sun)|direct sun(?:light)?)\b/.test(text))topics.push('excessLight');
+ return topics;
+}
+function launchResponse(topic,profile,session,ask,options,text){
+ const f=session.facts,name=session.plant,species=normalize(profile.name||options.aliases?.[name]||name);
+ if(topic==='namedPest'){
+  const guide=(options.pests||[]).find(p=>normalize(p.pest)===f.namedPest);
+  if(!guide)return 'You named '+f.namedPest+'. Use its entry in the app’s Pest & Problem Guide for the matching treatment and follow-up instructions.';
+  return 'For '+guide.pest.toLowerCase()+', the local guide says: '+guide.response+' '+guide.followup;
+ }
+ if(topic==='comparison')return 'Overwatering and underwatering can both cause yellowing or wilting, so leaves alone cannot settle it. Soil that stays wet, wilting despite wet soil, or soft roots points toward excess moisture. Very dry soil, a noticeably lighter pot, and limp, curled or crispy foliage points toward thirst. Check below the surface before watering.'+(f.moisture==='wet'?' You already described wet soil, so hold off on watering.':f.moisture==='dry'?' You already described dry soil, which makes thirst more plausible.':/\b(?:my plant|am i|i'm|i am)\b/.test(text)?ask('moisture'):'' );
+ if(topic==='leafless'){
+  if(f.leafless===false)return 'New leaves are an encouraging sign of recovery. Keep conditions steady and check soil moisture before watering; avoid extra fertilizer to rush growth.';
+  let answer='Losing every leaf does not by itself mean a plant is dead. Recovery depends on the plant and whether its roots and growing points are still alive. ';
+  if(f.healthyRoots===true||f.mushy===false)answer+='The firm roots you described are encouraging. ';
+  if(f.livingTissue===true)answer+='Firm, green tissue is another encouraging sign. ';
+  if(f.livingTissue===false||f.mushy===true)answer+='Soft or dead tissue is more concerning; avoid assuming that extra water or fertilizer will revive it. ';
+  answer+='Keep any firm living parts intact, check soil moisture, and avoid extra watering to force new leaves.';
+  return answer+ask('plant','livingTissue','roots');
+ }
+ if(topic==='outdoors'){
+  let answer=(name?name+' may be able to spend time outdoors in suitable weather. ':'Outdoor suitability depends on the plant. ');
+  answer+='Outdoor sun is much stronger than indoor light. Start in a sheltered, shaded spot and increase exposure gradually; avoid a sudden move into direct sun. ';
+  if(profile.light)answer+='Its guide recommends '+profile.light.replace(/[.]$/,'').toLowerCase()+'. ';
+  if(f.light)answer+='Since it currently gets '+f.light+', make the transition gradually. ';
+  answer+='Check that overnight temperatures suit the species before moving it.';
+  if(f.temperature)answer+=' Your reported '+f.temperature+' should be compared with that plant’s temperature needs.';
+  return answer+ask('plant','temperature');
+ }
+ if(topic==='smallLeaves'){
+  let answer='Smaller new leaves can reflect low light, root stress, limited nutrients, or a recent change in growing conditions. ';
+  if(f.changes?.length)answer+='The recent '+f.changes.join(' or ')+' may be relevant. ';
+  if(f.light)answer+='You described '+f.light+'; compare that with the plant’s usual light needs. ';
+  if(/pothos|monstera|climbing philodendron/.test(species))answer+='For this climbing plant, suitable support can also help leaves mature. ';
+  answer+='Check growing conditions before adding extra fertilizer.';
+  return answer+ask('plant','light','moisture');
+ }
+ if(topic==='excessLight'){
+  let answer='Bright indirect light is different from direct sun falling on the leaves. Sudden or prolonged direct exposure can scorch an unacclimated plant, but brightness alone does not prove light damage. ';
+  if(profile.light)answer+='The guide for '+name+' recommends '+profile.light.replace(/[.]$/,'').toLowerCase()+'. ';
+  if(f.light)answer+='You described '+f.light+'. ';
+  if(f.sunHours!==undefined)answer+='With '+f.sunHours+' hours of direct sun, acclimation and the species’ needs matter. ';
+  answer+='Look for damage concentrated on the sun-facing side; protect it from harsh rays if damage appeared after an increase in exposure.';
+  return answer+ask('plant','sunHours');
+ }
+ return '';
+}
 function answer(input,session=createSession(),options={}){
  const previousPending=session.pending;
  const c=extract(input,session,options.names||[]);
@@ -149,14 +214,20 @@ function answer(input,session=createSession(),options={}){
  if(samePlant&&(options.aliases?.[session.plant]||normalize(session.plant).length>normalize(c.plant).length))c.plant=session.plant;
  if(c.plant)session.plant=c.plant;
  let topics=topicsFor(c.text);
+ let focused=c.focused;
+ if(c.clues.namedPest)focused=[...focused,'namedPest'];
+
+
  const explicitCare=/\b(?:how|when|should|can|do|does)\b[^.!?]{0,50}\b(?:water(?:ing)?|fertiliz\w*|feed|repot\w*|propagat\w*|rotate|mist|clean|wipe)\b|\b(?:what|which)\s+(?:kind of |type of )?(?:light|humidity|soil|fertilizer|mix)\b/.test(c.text);
  const directCare=(explicitCare||c.intent==='care'||(c.intent!=='troubleshooting'&&(/^(?:and |what about |how about |also,? )/.test(c.text)||c.text.endsWith('?'))))&&topics.length>0;
+ if(!focused.length&&session.topic?.kind==='focused'&&!directCare&&(Object.keys(c.clues).length||c.plant))focused=session.topic.topics.filter(t=>t!=='namedPest'||c.clues.namedPest!==null);
  const careFollow=session.topic?.kind==='care'&&!directCare&&c.intent!=='troubleshooting'&&((session.pending==='plant'&&c.plant)||(session.pending==='node'&&c.clues.node!==undefined));
  const isNewCare=directCare||careFollow;
  if(careFollow)topics=session.topic.topics;
  // Keep known conditions when the user changes care topics. Care replies simply
  // do not diagnose old symptoms, and old conflicts do not interrupt a care answer.
- if(directCare)session.topic={kind:'care',topics};
+ if(focused.length)session.topic={kind:'focused',topics:focused};
+ else if(directCare)session.topic={kind:'care',topics};
  else if(!isNewCare)session.topic={kind:'troubleshooting'};
  if(c.correction){
   if(c.clues.healthyRoots===true&&c.clues.mushy===undefined){session.facts.mushy=false;delete session.facts.mixedRoots;}
@@ -175,7 +246,12 @@ function answer(input,session=createSession(),options={}){
  let response='',possibilities=[];
  if(yes('healthyRoots')&&yes('mushy')&&!yes('mixedRoots'))f.rootCondition='conflict';else delete f.rootCondition;
  const conflicts=Object.keys(f).filter(k=>f[k]==='conflict');
- if(isNewCare){response=care(c.text,profile,session,ask,topics);}
+ if(focused.length&&(!conflicts.length||focused.includes('comparison'))){
+  response=focused.map(topic=>launchResponse(topic,profile,session,ask,options,c.text)).filter(Boolean).join(' ');
+  const additional=topics.filter(t=>!(t==='light'&&focused.some(x=>['excessLight','outdoors'].includes(x)))&&!(t==='watering'&&focused.includes('comparison')));
+  if(additional.length)response+=' '+care(c.text,profile,session,ask,additional);
+ }
+ else if(isNewCare){response=care(c.text,profile,session,ask,topics);}
  else if(conflicts.length){const key=conflicts[0],id='conflict:'+key;response='Those details point in different directions, so I would hold off on treatment.';if(!session.asked.includes(id)){session.asked.push(id);follow=key;followText=key==='moisture'?'Is the soil dry only on top, or also deeper around the roots?':key==='rootCondition'?'Are some roots soft while others are firm, or do all the roots feel firm now?':'Are you still seeing '+({bugs:'bugs',webbing:'webbing',yellow:'yellow leaves',mushy:'soft, mushy tissue'}[key]||'that change')+' now?';}}
  else {
  const leaf=yes('yellow')||yes('wilt')||yes('drop');
@@ -223,7 +299,7 @@ function answer(input,session=createSession(),options={}){
  }
  if(followText)response+=' '+followText;
  session.pending=follow;session.turns.push({user:input,answer:response});
- return {response,intent:isNewCare?'care':'troubleshooting',facts:{...f},plant:session.plant,possibilities,followup:follow,health:!isNewCare&&Object.entries(patterns).some(([k])=>!['healthyRoots','rot','slow','leggy'].includes(k)&&yes(k))};
+ return {response,intent:focused.length?(focused.some(t=>['leafless','smallLeaves','namedPest'].includes(t))?'troubleshooting':'care'):isNewCare?'care':'troubleshooting',facts:{...f},plant:session.plant,possibilities,followup:follow,health:(focused.includes('leafless')&&f.leafless!==false)||focused.includes('smallLeaves')||!isNewCare&&Object.entries(patterns).some(([k])=>!['healthyRoots','rot','slow','leggy'].includes(k)&&yes(k))};
 }
 function wateringWait(profile,facts={}){
  if(facts.deepMoisture==='wet')return 'Since it is still wet deeper around the roots, do not water yet. Check moisture deeper in the root zone again before watering; a dry surface alone is not enough.';

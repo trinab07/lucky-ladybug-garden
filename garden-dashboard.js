@@ -97,14 +97,15 @@
    byId('gardenQuickForm').addEventListener('submit',event=>{
     event.preventDefault();
     if(!event.currentTarget.reportValidity())return;
+    const before=JSON.parse(JSON.stringify(db));
     try{
      const stamp={date:localISODate(),time:timeNow()};
      const values={plantId:byId('quickPlantId')?.value,note:byId('quickNote')?.value,nickname:byId('quickNickname')?.value,profile:byId('quickProfile')?.value,acquired:byId('quickAcquired')?.value,actions:[...document.querySelectorAll('input[name="quickAction"]:checked')].map(e=>e.value)};
      const records=({health:quickHealth,care:quickCare,plant:quickPlant}[kind])(db,values,stamp);
      for(const record of records)recordGardenJournal(kind==='plant'?'plants':'care',kind==='plant'?'Plant added to My Plants':record.activity,{date:record.date||record.acquired,time:record.time||stamp.time,plant:kind==='plant'?carePlantName(record):record.plant,plantId:kind==='plant'?record.id:record.plantId,detail:record.symptoms||record.notes||'Added with Quick Add'});
-     closeSheet();save();
+     save();closeSheet();
      byId('gardenQuickStatus').textContent=kind==='care'?'Care saved to your log.':'Saved. You can finish it from Needs your attention.';
-    }catch(error){byId('gardenQuickError').textContent=error.message;}
+    }catch(error){for(const key of Object.keys(db))delete db[key];Object.assign(db,before);try{save();}catch{}byId('gardenQuickStatus').textContent='';byId('gardenQuickError').textContent='Could not save. '+error.message+' Your entry is still here; please try again.';}
    });
   }
   window.openGardenQuick=showQuick;
@@ -160,7 +161,7 @@
    byId('careAttentionList').innerHTML=cards(items.due,'Nothing needs attention right now.');
    // Preserve the existing active-propagation and collection definitions.
    byId('kPlantsDash').textContent=db.plants.filter(p=>!p.archived).length;
-   byId('kPropDash').textContent=byId('kProp').textContent||'0';
+   byId('kPropDash').textContent=String(db.prop.filter(p=>p.status!=="Didn't survive"&&!['Keep','Gift','Share'].includes(p.destination)&&p.saleStatus!=='Sold').length);
    byId('kAttention').textContent=items.due.length;
    byId('dashAttentionLine').style.display='none';
    // Keep the overview short; the full log remains one click away.

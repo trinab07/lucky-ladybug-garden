@@ -12,7 +12,7 @@ window.runAskAssistant=function(){
  const name=extracted.plant&&Ladybug.samePlantName(extracted.plant,session.plant,aliases)?session.plant:extracted.plant||session.plant;
  const saved=plants.find(p=>carePlantName(p).toLowerCase()===String(name).toLowerCase());
  const profile=Ladybug.resolveProfile(saved?.profile||name,LIB);
- const result=Ladybug.answer(question,session,{names,profile,library:LIB,aliases});
+ const result=Ladybug.answer(question,session,{names,profile,library:LIB,pests:typeof PESTS!=='undefined'?PESTS:[],aliases});
  const user=document.createElement('div');user.className='askBubble user';user.textContent=question;output.appendChild(user);
  const bot=document.createElement('div');bot.className='askBubble bot';
  if(result.plant){const chip=document.createElement('span');chip.className='askContextChip';chip.textContent='🌿 '+result.plant;bot.appendChild(chip);}

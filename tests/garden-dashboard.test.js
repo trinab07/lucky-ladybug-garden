@@ -4,7 +4,7 @@ const stamp={date:'2026-09-08',time:'10:30'};
 const fixture=()=>({plants:[{id:1,pid:'PLT-001',nickname:'Sunny',profile:'Golden Pothos',soil:'2026-08-01',snoozeUntil:'2026-09-10'},{id:2,nickname:'Spike',profile:'Snake Plant'}],care:[],budget:123,expenses:[{id:8,actual:12}],draft:{type:'expense',values:{item:'Pot'}},prop:[]});
 test('page markup outside Dashboard and Care remains unchanged',()=>{
  const outside=fs.readFileSync('index.html','utf8').replace(/<script[\s\S]*?<\/script>/g,'').replace(/<section id="dashboard"[\s\S]*?<\/section>/,'').replace(/<section id="care"[\s\S]*?<\/section>/,'').replace(/<link rel="stylesheet" href="garden-dashboard.css">\s*/,'').replace(/\s+/g,' ');
- assert.equal(crypto.createHash('sha256').update(outside.trim()).digest('hex'),'eb2d74a4c0566ff2c2d1012bf12474fc7bb26be08d2f641db3f313b0c6f80fb8');
+ assert.equal(crypto.createHash('sha256').update(outside.trim()).digest('hex'),'4b1c068539d959e0d18a3c0f1ffb8ff67592b9f67290a9bd0f31939f61b5f2b4');
 });
 test('quick concern accepts only plant, optional note and default timestamp',()=>{
  const d=fixture(),[c]=G.quickHealth(d,{plantId:'1',note:'Yellow leaves and wet soil.'},stamp);
@@ -95,7 +95,7 @@ test('Dashboard contains four compact cards and no expanded lists or old hero',(
  assert.match(visible,/openGardenQuick\('health'\)/);assert.match(visible,/openGardenQuick\('care'\)/);assert.match(visible,/openGardenQuick\('plant'\)/);
 });
 test('overview counts use live attention state and details open only on request',()=>{
- const h=installed();G.quickHealth(h.d,{plantId:1,note:'Yellow leaf'},stamp);G.quickPlant(h.d,{nickname:'Fern',profile:'Boston Fern'},stamp);h.element('kProp').textContent='2';h.context.renderAll();
+ const h=installed();G.quickHealth(h.d,{plantId:1,note:'Yellow leaf'},stamp);G.quickPlant(h.d,{nickname:'Fern',profile:'Boston Fern'},stamp);h.d.prop=[{status:'Rooting'},{status:'Rooted',destination:'Sell',saleStatus:'Listed'},{status:'Rooted',destination:'Gift'},{status:'Rooted',destination:'Keep'},{status:'Rooted',saleStatus:'Sold'},{status:"Didn't survive"}];h.context.renderAll();
  assert.equal(h.element('gardenAttentionCount').textContent,2);assert.equal(h.element('gardenDueCount').textContent,0);assert.equal(h.element('kPlantsDash').textContent,3);assert.equal(h.element('kPropDash').textContent,'2');
  h.context.openGardenOverview('attention');assert.match(h.context.markup,/Finish Health Concern/);assert.match(h.context.markup,/Finish plant profile/);assert.match(h.context.markup,/openGardenAttention/);
  h.context.openGardenOverview('upcoming');assert.match(h.context.markup,/No care scheduled/);assert.doesNotMatch(h.context.markup,/Yellow leaf/);

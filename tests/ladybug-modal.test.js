@@ -33,7 +33,7 @@ function setup(){
  const db={plants:[{id:7,name:'Sunny'},{id:8,name:'Spike'}],care:[],draft:null};
  const storage={};
  const context={document,overlay,db,LIB:[],Ladybug:require('../ladybug-engine'),carePlantName:p=>p.name,
-  localStorage:{setItem:(k,v)=>storage[k]=v},Event:class{constructor(type){this.type=type;}},
+  localStorage:{getItem:k=>storage[k]||null,setItem:(k,v)=>storage[k]=v},Event:class{constructor(type){this.type=type;}},
   show(){visible=true;sheet.replaceChildren();},closeSheet(){visible=false;},
   discardCurrentSheet(){context.closeSheet();sheet.replaceChildren();},
   openAskAssistant(name){context.show();const select=sheet.appendChild(new Element('select','askSavedPlant'));select.value=name||'';sheet.appendChild(new Element('textarea','askQuestion'));sheet.appendChild(new Element('button','submit'));},
@@ -42,6 +42,7 @@ function setup(){
  context.window=context;vm.createContext(context);
  // Use the app's actual capture logic, including draft metadata and persistence.
  const html=fs.readFileSync('index.html','utf8');
+ vm.runInContext(html.slice(html.indexOf('function persistGardenData()'),html.indexOf('function recentCareEntries()')),context);
  vm.runInContext(html.slice(html.indexOf('function captureDraftIfAny()'),html.indexOf('function clearDraft()')),context);
  vm.runInContext(fs.readFileSync('ladybug-ui.js','utf8'),context);
  function key(shiftKey=false){let prevented=false;for(const fn of events.keydown)fn({key:'Tab',shiftKey,preventDefault(){prevented=true;}});return prevented;}
