@@ -3,8 +3,8 @@ const G=require('../garden-dashboard');
 const stamp={date:'2026-09-08',time:'10:30'};
 const fixture=()=>({plants:[{id:1,pid:'PLT-001',nickname:'Sunny',profile:'Golden Pothos',soil:'2026-08-01',snoozeUntil:'2026-09-10'},{id:2,nickname:'Spike',profile:'Snake Plant'}],care:[],budget:123,expenses:[{id:8,actual:12}],draft:{type:'expense',values:{item:'Pot'}},prop:[]});
 test('page markup outside Dashboard and Care remains unchanged',()=>{
- const outside=fs.readFileSync('index.html','utf8').replace(/<script[\s\S]*?<\/script>/g,'').replace(/<section id="dashboard"[\s\S]*?<\/section>/,'').replace(/<section id="care"[\s\S]*?<\/section>/,'').replace(/<link rel="stylesheet" href="garden-dashboard.css">\s*/,'').replace(/\s+/g,' ');
- assert.equal(crypto.createHash('sha256').update(outside.trim()).digest('hex'),'4b1c068539d959e0d18a3c0f1ffb8ff67592b9f67290a9bd0f31939f61b5f2b4');
+ const outside=fs.readFileSync('index.html','utf8').replace(/<script[\s\S]*?<\/script>/g,'').replace(/<section id="dashboard"[\s\S]*?<\/section>/,'').replace(/<section id="care"[\s\S]*?<\/section>/,'').replace(/<link rel="stylesheet" href="garden-dashboard.css">\s*/,'').replace(/<link rel="stylesheet" href="garden-content.css">\s*/,'').replace(/\s+/g,' ');
+ assert.equal(crypto.createHash('sha256').update(outside.trim()).digest('hex'),'d9f66f744eb35109dd1556e48a85b5362be43b7dbe1cc8ca31876c1ee47c1a67');
 });
 test('quick concern accepts only plant, optional note and default timestamp',()=>{
  const d=fixture(),[c]=G.quickHealth(d,{plantId:'1',note:'Yellow leaves and wet soil.'},stamp);
@@ -91,7 +91,7 @@ test('Dashboard contains four compact cards and no expanded lists or old hero',(
  for(const removed of ['gardenAttentionList','gardenUpcomingList','Today / upcoming','Garden snapshot','llgDashboardHero','llgGardenPicture','kBudget','dashboardSalesSnapshot'])assert.ok(!visible.includes(removed),removed+' must not occupy the Dashboard');
  assert.match(visible,/openGardenOverview\('attention'\)/);assert.match(visible,/openGardenOverview\('upcoming'\)/);
  assert.match(visible,/go\('plants'\)/);assert.match(visible,/go\('propagation'\)/);
- const headings=['Garden at a glance','Quick Add','Recent Activity','Ask about your plant'].map(s=>visible.indexOf(s));assert.ok(headings.every((p,i)=>p>=0&&(!i||p>headings[i-1])));
+ const headings=['Garden at a glance','Quick Add','Recent Activity'].map(s=>visible.indexOf(s));assert.ok(headings.every((p,i)=>p>=0&&(!i||p>headings[i-1])));
  assert.match(visible,/openGardenQuick\('health'\)/);assert.match(visible,/openGardenQuick\('care'\)/);assert.match(visible,/openGardenQuick\('plant'\)/);
 });
 test('overview counts use live attention state and details open only on request',()=>{

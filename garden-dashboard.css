@@ -32,7 +32,7 @@
 #dashboard .gardenBlue .gardenSummaryTape{transform:rotate(4deg)}
 #dashboard .gardenSummaryCard:focus-visible,#dashboard .gardenDashboardActions button:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
 #dashboard .gardenQuickRow{display:grid;gap:10px;margin:20px 0 12px;padding:14px 16px;background:#f5edcf;border:1px solid #d8c99e;border-radius:4px;box-shadow:2px 3px 0 #ddd7c344}
-#dashboard .gardenQuickRow h2,#dashboard .gardenRecentHeading h2,#dashboard .gardenLadybugBanner h2{font-size:17px;margin:0;color:var(--navy)}
+#dashboard .gardenQuickRow h2,#dashboard .gardenRecentHeading h2{font-size:17px;margin:0;color:var(--navy)}
 #dashboard .gardenDashboardActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 #dashboard .gardenDashboardActions button{min-width:0;min-height:44px;padding:8px 10px;font-size:12px;background:#fffdf4;border:1px solid #b8c4aa;white-space:normal;overflow-wrap:anywhere}
 #dashboard .gardenCaptureStatus{font-size:12px;margin:0 0 10px;color:var(--muted)}
@@ -43,11 +43,6 @@
 #dashboard #recentActivity .row{padding:7px 0!important;font-size:12px;min-height:0}
 #dashboard #recentActivity .plantArt{width:32px!important;height:36px!important;min-width:32px!important;flex-basis:32px!important;margin:0 8px 0 0!important}
 #dashboard #recentActivity .empty{padding:14px 0;font-size:12px}
-#dashboard .gardenLadybugBanner{display:flex;align-items:center;gap:12px;padding:14px 16px;margin:16px 0 8px;background:#e8efda;border:1px dashed #b6c5a9;border-radius:12px}
-#dashboard .gardenLadybugBanner p{font-size:12px;margin:4px 0 0;color:var(--muted)}
-#dashboard .gardenHelpBug{font-size:26px}
-#dashboard .gardenLadybugBanner>div{flex:1;min-width:0}
-#dashboard .gardenLadybugBanner button{min-height:44px;padding:8px 12px;font-size:12px}
 #dashboard .gardenLegacyHooks{display:none!important}
 @media(max-width:600px){
  #dashboard .gardenOverviewGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -58,6 +53,4 @@
  #dashboard .gardenDashboardActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
  #dashboard .gardenDashboardActions button{font-size:11px;padding:7px 5px}
  #dashboard .gardenRecentPaper{padding:9px 12px}
- #dashboard .gardenLadybugBanner{display:grid;grid-template-columns:26px 1fr;padding:12px;gap:8px}
- #dashboard .gardenLadybugBanner button{grid-column:2;justify-self:start}
 }
