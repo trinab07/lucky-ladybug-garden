@@ -1,0 +1,14 @@
+/* Access screens only; garden styling is unchanged. */
+[hidden]{display:none!important}
+#llgAccess{min-height:100dvh;display:grid;place-items:center;padding:24px 16px;background:#fffaf2;color:#244b35;box-sizing:border-box}
+#llgAccess .accessCard{max-width:460px;width:100%;text-align:center}
+#llgAccess .accessIcon{display:block;margin:0 auto 18px;border-radius:22px}
+#llgAccess h1{font:700 28px/1.2 Georgia,serif;margin:0 0 18px}
+#llgAccess p,#llgAccess li{font:16px/1.55 Arial,sans-serif}
+#llgAccess ol{text-align:left;padding-left:25px}
+#llgAccess button{width:100%;border:0;border-radius:24px;padding:14px 18px;background:#285d39;color:white;font:700 16px Arial,sans-serif;cursor:pointer;margin:12px 0}
+#llgAccess button:disabled{opacity:.6;cursor:wait}
+#llgAccess input{box-sizing:border-box;width:100%;font-size:18px;padding:14px;border:1px solid #879b84;border-radius:12px;margin-top:8px}
+#llgAccess .accessNote{font-size:14px;color:#586654}
+#llgUnlockError{color:#963c26}
+#existingGarden{border:1px solid #ab7957;padding:12px;border-radius:12px}

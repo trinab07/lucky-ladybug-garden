@@ -2,9 +2,9 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const G=require('../garden-dashboard');
 const stamp={date:'2026-09-08',time:'10:30'};
 const fixture=()=>({plants:[{id:1,pid:'PLT-001',nickname:'Sunny',profile:'Golden Pothos',soil:'2026-08-01',snoozeUntil:'2026-09-10'},{id:2,nickname:'Spike',profile:'Snake Plant'}],care:[],budget:123,expenses:[{id:8,actual:12}],draft:{type:'expense',values:{item:'Pot'}},prop:[]});
-test('page markup outside Dashboard and Care matches the simplified hierarchy',()=>{
+test('page markup outside Dashboard and Care matches the install-first release',()=>{
  const outside=fs.readFileSync('index.html','utf8').replace(/<script[\s\S]*?<\/script>/g,'').replace(/<section id="dashboard"[\s\S]*?<\/section>/,'').replace(/<section id="care"[\s\S]*?<\/section>/,'').replace(/<link rel="stylesheet" href="garden-dashboard.css">\s*/,'').replace(/<link rel="stylesheet" href="garden-content.css">\s*/,'').replace(/\s+/g,' ');
- assert.equal(crypto.createHash('sha256').update(outside.trim()).digest('hex'),'49b2ed44927c8440b2d9196bbd96aa096d56d4fd88ee80c543605f75d0dffcb9');
+ assert.equal(crypto.createHash('sha256').update(outside.trim()).digest('hex'),'3eea1bfac76ee5ccef3aafa61318c097419e6d6198f0478442ba90e9749f2ca9');
 });
 test('quick concern accepts only plant, optional note and default timestamp',()=>{
  const d=fixture(),[c]=G.quickHealth(d,{plantId:'1',note:'Yellow leaves and wet soil.'},stamp);

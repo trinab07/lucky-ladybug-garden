@@ -1,6 +1,6 @@
 const { getStore } = require("@netlify/blobs");
 
-const DEVICE_CAP = 2;
+const DEVICE_CAP = 1;
 const FRIENDS_CAP = 10;
 
 function json(status, obj) {
@@ -16,20 +16,25 @@ function blobStore(name) {
     name,
     siteID: process.env.NETLIFY_SITE_ID,
     token: process.env.NETLIFY_BLOBS_TOKEN,
+    consistency: "strong",
   });
 }
 
 async function checkAndRecordDevice(store, key, deviceId, cap) {
-  const existing = (await store.get(key, { type: "json" })) || { devices: [] };
-  if (existing.devices.includes(deviceId)) {
-    return { allowed: true };
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const current = await store.getWithMetadata(key, { type: "json" });
+    const existing = current ? current.data : { devices: [] };
+    if (existing.devices.includes(deviceId)) return { allowed: true };
+    if (existing.devices.length >= cap) return { allowed: false };
+    const devices = [...existing.devices, deviceId];
+    const result = await store.setJSON(key, { ...existing, devices },
+      current ? { onlyIfMatch: current.etag } : { onlyIfNew: true });
+    if (result.modified) {
+      const saved = await store.get(key, { type: "json" });
+      if (saved && saved.devices.includes(deviceId)) return { allowed: true };
+    }
   }
-  if (existing.devices.length >= cap) {
-    return { allowed: false };
-  }
-  existing.devices.push(deviceId);
-  await store.setJSON(key, existing);
-  return { allowed: true };
+  throw new Error("Activation could not be saved. Please retry from the same installed app.");
 }
 
 async function getFreshAccessToken(authStore) {
@@ -175,7 +180,7 @@ exports.handler = async function (event) {
   if (!result.allowed) {
     return json(200, {
       valid: false,
-      message: "This order has already been activated on its maximum number of devices.",
+      message: "This purchase allows one installed app context and has already been activated. Open your original Home Screen icon. If you changed devices or cleared storage, contact the shop for help.",
     });
   }
 
